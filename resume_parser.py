@@ -19,31 +19,6 @@ NER_TOKENIZER = AutoTokenizer.from_pretrained(NER_MODEL_ID)
 NER_MODEL = AutoModelForTokenClassification.from_pretrained(NER_MODEL_ID)
 NER_PIPE = pipeline("ner", model=NER_MODEL, tokenizer=NER_TOKENIZER, aggregation_strategy="simple")
 
-# CACHE_DIR = "cached"
-# os.makedirs(CACHE_DIR, exist_ok=True)
-
-# # Auto-generate skill cache from job_skills.csv
-# CACHE_FILE = os.path.join(CACHE_DIR, "cached_skills.pkl")
-# if os.path.exists(CACHE_FILE):
-#     SKILL_SET = joblib.load(CACHE_FILE)
-#     print(f"✅ Loaded skill cache from {CACHE_FILE} ({len(SKILL_SET)} skills)")
-# else:
-#     print("⚙️ Generating skill cache from datasets/job_skills.csv...")
-#     job_skills_csv = "datasets/job_skills.csv"
-#     if not os.path.exists(job_skills_csv):
-#         raise FileNotFoundError(f"Missing required dataset: {job_skills_csv}")
-    
-#     df = pd.read_csv(job_skills_csv)
-#     skill_set = set()
-#     for skill_list in tqdm(df["job_skills"].dropna(), desc="Processing job_skills.csv"):
-#         for skill in skill_list.split(","):
-#             clean_skill = skill.strip().title()
-#             if 2 < len(clean_skill) <= 50:
-#                 skill_set.add(clean_skill)
-#     SKILL_SET = sorted(skill_set)
-#     joblib.dump(SKILL_SET, CACHE_FILE)
-#     print(f"✅ Cached {len(SKILL_SET)} unique skills to {CACHE_FILE}")
-
 # Skills Section Keywords
 SECTION_KEYWORDS = [
     "skills", "keterampilan", "kemampuan", "proficiencies", "keahlian", "kompetensi", "technical skills", "keahlian teknis", "soft skills", "keahlian soft", "hard skills", "keahlian hard", "expertise", "spesialisasi", "specializations", "skill set", "skillset", "capabilities", "kualifikasi"
@@ -108,7 +83,6 @@ class ResumeParser:
         self.cleaned_text = self.clean_text(self.text)
         self.ner_results = self.ner_with_indobert()
         self.sections = self.segment_sections()
-        # self.predefined_skills = self.load_skill_dataset()
         self.details = self.build_details()
 
     def extract_text(self):
@@ -122,9 +96,6 @@ class ResumeParser:
     def ner_with_indobert(self):
         sentences = re.split(r'(?<=[.!?]) +', self.cleaned_text)
         return [ent for sentence in sentences for ent in NER_PIPE(sentence[:512])]
-
-    # def load_skill_dataset(self):
-    #     return SKILL_SET
 
     def extract_name_from_ner(self):
         ner_results = self.ner_results

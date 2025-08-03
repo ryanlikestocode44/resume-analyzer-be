@@ -1,4 +1,3 @@
-import csv
 import random
 import time
 from skills import (
@@ -10,22 +9,6 @@ from courses import (
 )
 from videos import resume_videos, interview_videos
 
-# === Load skills dari predefined CSV ===
-# def load_predefined_skills(filepath="cached/cached_skills.pkl"):
-#     skills = set()
-#     try:
-#         with open(filepath, "r", encoding="utf-8") as f:
-#             reader = csv.reader(f)
-#             next(reader, None)  # skip header
-#             for row in reader:
-#                 if row and row[0].strip():
-#                     skills.add(row[0].strip().lower())
-#     except Exception as e:
-#         print(f"Failed to load predefined skills dataset: {e}")
-#     return skills
-
-# === Load sekali saat import ===
-# predefined_skills = load_predefined_skills()
 
 # === FUNGSI ===
 def recommend_field(skills):
