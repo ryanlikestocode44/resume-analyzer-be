@@ -1,6 +1,7 @@
 from flask import Flask, request, jsonify
 from flask_cors import CORS
 import traceback
+import os
 
 from resume_parser import ResumeParser
 from error_handlers import register_error_handlers
@@ -42,6 +43,8 @@ def upload_resume():
     except Exception as e:
         traceback.print_exc()  # Log error details to console
         return jsonify({"Error": str(e)}), 500
-    
-if __name__ == "__main__":
-    app.run(debug=True, port=5000)
+
+if __name__ == '__main__':
+    port = int(os.environ.get("PORT", 5000))  # gunakan PORT dari Render
+    app.run(host='0.0.0.0', port=port)
+
