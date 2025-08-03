@@ -8,11 +8,8 @@ from nltk import sent_tokenize
 from transformers import AutoTokenizer, AutoModelForTokenClassification, pipeline, logging
 from tqdm import tqdm
 import joblib
+import requests
 from recommender import recommend_courses, recommend_field, recommend_videos, recommend_skills
-
-print("⏳ Loading IndoBERT NER model and skill cache...")
-CACHE_DIR = "cached"
-os.makedirs(CACHE_DIR, exist_ok=True)
 
 # Auto-load IndoBERT
 logging.set_verbosity_error()  # suppress loading logs
@@ -23,27 +20,49 @@ NER_TOKENIZER = AutoTokenizer.from_pretrained(NER_MODEL_ID)
 NER_MODEL = AutoModelForTokenClassification.from_pretrained(NER_MODEL_ID)
 NER_PIPE = pipeline("ner", model=NER_MODEL, tokenizer=NER_TOKENIZER, aggregation_strategy="simple")
 
-# Auto-generate skill cache from job_skills.csv
+# Konstanta
+CACHE_DIR = "cached"
+os.makedirs(CACHE_DIR, exist_ok=True)
 CACHE_FILE = os.path.join(CACHE_DIR, "cached_skills.pkl")
+GDRIVE_SKILL_FILE_URL = "https://drive.google.com/uc?export=download&id=1UOapofhvBSaKOCG2znZkCk6_GY1amGEe"
+
+# Fungsi download dari Google Drive
+def download_cached_skills_from_gdrive(url, dest_path):
+    print("⬇️ Downloading skill cache from Google Drive...")
+    response = requests.get(url)
+    if response.status_code == 200:
+        with open(dest_path, "wb") as f:
+            f.write(response.content)
+        print(f"✅ Downloaded skill cache to {dest_path}")
+    else:
+        raise Exception(f"❌ Failed to download skill cache: {response.status_code}")
+
+# Load atau download skill cache
 if os.path.exists(CACHE_FILE):
     SKILL_SET = joblib.load(CACHE_FILE)
     print(f"✅ Loaded skill cache from {CACHE_FILE} ({len(SKILL_SET)} skills)")
 else:
-    print("⚙️ Generating skill cache from datasets/job_skills.csv...")
-    job_skills_csv = "datasets/job_skills.csv"
-    if not os.path.exists(job_skills_csv):
-        raise FileNotFoundError(f"Missing required dataset: {job_skills_csv}")
-    
-    df = pd.read_csv(job_skills_csv)
-    skill_set = set()
-    for skill_list in tqdm(df["job_skills"].dropna(), desc="Processing job_skills.csv"):
-        for skill in skill_list.split(","):
-            clean_skill = skill.strip().title()
-            if 2 < len(clean_skill) <= 50:
-                skill_set.add(clean_skill)
-    SKILL_SET = sorted(skill_set)
-    joblib.dump(SKILL_SET, CACHE_FILE)
-    print(f"✅ Cached {len(SKILL_SET)} unique skills to {CACHE_FILE}")
+    try:
+        download_cached_skills_from_gdrive(GDRIVE_SKILL_FILE_URL, CACHE_FILE)
+        SKILL_SET = joblib.load(CACHE_FILE)
+        print(f"✅ Loaded downloaded skill cache ({len(SKILL_SET)} skills)")
+    except Exception as e:
+        print(str(e))
+        print("⚙️ Falling back to regenerating skill cache from job_skills.csv...")
+        job_skills_csv = "datasets/job_skills.csv"
+        if not os.path.exists(job_skills_csv):
+            raise FileNotFoundError(f"Missing required dataset: {job_skills_csv}")
+
+        df = pd.read_csv(job_skills_csv)
+        skill_set = set()
+        for skill_list in tqdm(df["job_skills"].dropna(), desc="Processing job_skills.csv"):
+            for skill in skill_list.split(","):
+                clean_skill = skill.strip().title()
+                if 2 < len(clean_skill) <= 50:
+                    skill_set.add(clean_skill)
+        SKILL_SET = sorted(skill_set)
+        joblib.dump(SKILL_SET, CACHE_FILE)
+        print(f"✅ Cached {len(SKILL_SET)} unique skills to {CACHE_FILE}")
 
 # Skills Section Keywords
 SECTION_KEYWORDS = [
