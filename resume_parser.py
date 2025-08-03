@@ -1,13 +1,9 @@
-import os
 import re
 import pdfplumber
-import pandas as pd
 from datetime import datetime
 from dateutil import parser as date_parser
 from nltk import sent_tokenize
 from transformers import AutoTokenizer, AutoModelForTokenClassification, pipeline, logging
-from tqdm import tqdm
-import joblib
 from recommender import recommend_courses, recommend_field, recommend_videos, recommend_skills
 
 # Auto-load IndoBERT
