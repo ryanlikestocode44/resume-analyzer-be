@@ -5,3 +5,4 @@ pandas
 pdfplumber
 python-dateutil
 transformers
+torch
