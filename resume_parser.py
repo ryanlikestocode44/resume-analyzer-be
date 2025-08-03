@@ -10,8 +10,7 @@ from recommender import recommend_courses, recommend_field, recommend_videos, re
 logging.set_verbosity_error()  # suppress loading logs
 
 print("⏳ Loading IndoBERT NER Model...")
-# NER_MODEL_ID = "cahya/bert-base-indonesian-NER"
-NER_MODEL_ID = None
+NER_MODEL_ID = "cahya/bert-base-indonesian-NER"
 NER_TOKENIZER = AutoTokenizer.from_pretrained(NER_MODEL_ID)
 NER_MODEL = AutoModelForTokenClassification.from_pretrained(NER_MODEL_ID)
 NER_PIPE = pipeline("ner", model=NER_MODEL, tokenizer=NER_TOKENIZER, aggregation_strategy="simple")
