@@ -4,5 +4,9 @@ nltk
 pandas
 pdfplumber
 python-dateutil
-transformers
-torch
+spacy
+rapidfuzz
+langdetect
+phonenumbers
+gunicorn
+PyMuPDF

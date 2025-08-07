@@ -1,5 +1,6 @@
 import random
 import time
+import difflib
 from skills import (
     ds_skills, web_skills, android_skills, ios_skills, uiux_skills,
     cloud_skills, iot_skills, ml_skills, cs_skills
@@ -9,17 +10,17 @@ from courses import (
 )
 from videos import resume_videos, interview_videos
 
-
 # === FUNGSI ===
-def recommend_field(skills):
+def recommend_field(skills, top_n=3):
     if not skills:
         return {
             "field": None,
             "matched_skills": [],
-            "match_percent": 0
+            "match_percent": 0,
+            "alternative_fields": []
         }
 
-    skill_set = set(skill.lower() for skill in skills)
+    skill_set = set(skill.lower().strip() for skill in skills if skill.strip())
 
     field_map = {
         "Data Science": ds_skills,
@@ -37,27 +38,48 @@ def recommend_field(skills):
     matched_skills_map = {}
 
     for field, keywords in field_map.items():
-        matched = skill_set & keywords
+        normalized_keywords = set(k.lower().strip() for k in keywords)
+        matched = set()
+
+        for skill in skill_set:
+            match = difflib.get_close_matches(skill, normalized_keywords, n=1, cutoff=0.85)
+            if match:
+                matched.add(match[0])
+
         scores[field] = len(matched)
         matched_skills_map[field] = list(matched)
 
-    best_field = max(scores, key=scores.get)
+    # Urutkan berdasarkan skor tertinggi
+    sorted_fields = sorted(scores.items(), key=lambda x: x[1], reverse=True)
+    best_field, best_score = sorted_fields[0]
 
-    if scores[best_field] == 0:
+    if best_score == 0:
         return {
             "field": None,
             "matched_skills": [],
-            "match_percent": 0
+            "match_percent": 0,
+            "alternative_fields": []
         }
 
-    max_score = scores[best_field]
     total_keywords = len(field_map[best_field])
-    match_percent = round((max_score / total_keywords) * 100, 1) if total_keywords else 0
+    match_percent = round((best_score / total_keywords) * 100, 1) if total_keywords else 0
+
+    # Ambil alternatif bidang lain jika ada dengan skor mendekati
+    alternative_fields = []
+    for field, score in sorted_fields[1:top_n]:
+        if score > 0:
+            percent = round((score / len(field_map[field])) * 100, 1)
+            alternative_fields.append({
+                "field": field,
+                "matched_skills": matched_skills_map[field],
+                "match_percent": percent
+            })
 
     return {
         "field": best_field,
         "matched_skills": matched_skills_map[best_field],
         "match_percent": match_percent,
+        "alternative_fields": alternative_fields
     }
 
 def recommend_skills(detected_skills, top_n=10):
