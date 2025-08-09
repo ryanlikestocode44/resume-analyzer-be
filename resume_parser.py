@@ -249,7 +249,7 @@ class ResumeParser:
             sentences = sent_tokenize(self.text, language='english')  # fallback default
             if len(sentences) <= 1:
                 sentences = sent_tokenize(self.text, language='indonesian')
-        except:
+        except():
             sentences = [self.text]
 
         sentence_bonus = min(len(sentences) // 3, 3) * 1.0  # max 3 poin
@@ -264,6 +264,51 @@ class ResumeParser:
         score += sentence_bonus
 
         return round(min(score, 30), 1)
+    
+    def score_content_completeness(self):
+        """Hitung skor kelengkapan konten resume (0–100)."""
+        components = {
+            "name": bool(self.extract_name()),
+            "email": bool(self.extract_email()),
+            "phone": bool(self.extract_phone()),
+            "linkedin": bool(self.extract_links()[0]),
+            "github": bool(self.extract_links()[1]),
+            "skills": len(self.extract_skills()) > 0,
+            "education": len(self.extract_education()) > 0,
+            "projects": len(self.extract_projects()) > 0,
+            "experience": len(self.extract_experience()) > 0
+        }
+
+        # Bobot tiap komponen (total 1.0)
+        weights = {
+            "name": 0.1,
+            "email": 0.1,
+            "phone": 0.1,
+            "linkedin": 0.05,
+            "github": 0.05,
+            "skills": 0.2,
+            "education": 0.15,
+            "projects": 0.1,
+            "experience": 0.15
+        }
+
+        score = sum(weights[k] for k, v in components.items() if v) * 100
+        return round(score, 1)
+
+    def calculate_overall_score(self, skill_match_percent):
+        completeness = self.score_content_completeness()
+        experience = self.score_experience() * (100 / 30)
+        skill_match = skill_match_percent or 0
+
+        w_completeness = 0.4
+        w_experience = 0.35
+        w_skill_match = 0.25
+
+        overall = (completeness * w_completeness) + \
+                (experience * w_experience) + \
+                (skill_match * w_skill_match)
+
+        return round(overall, 1)
 
     def build_details(self):
         linkedin, github = self.extract_links()
@@ -273,7 +318,8 @@ class ResumeParser:
         field_info = recommend_field(matched_skills)
         recommended_courses = recommend_courses(field_info["field"])
         videos = recommend_videos()
-        return {
+        
+        details = {
             "name": self.extract_name(),
             "email": self.extract_email(),
             "phone": self.extract_phone(),
@@ -283,6 +329,7 @@ class ResumeParser:
             "education": self.extract_education(),
             "projects": self.extract_projects(),
             "experience_items": self.extract_experience(),
+            "total_experience_years": self.get_total_experience_from_text(),
             "recommended_skills": recommended_skills,
             "recommended_field": field_info["field"],
             "matched_field_skills": field_info["matched_skills"],
@@ -290,10 +337,13 @@ class ResumeParser:
             "recommended_courses": recommended_courses,
             "resume_video_url": videos["resume_video_url"],
             "interview_video_url": videos["interview_video_url"],
-            "resume_score": round(60 + 0.5 * len(matched_skills)),
             "experience_score": self.score_experience(),
-            "total_experience_years": self.get_total_experience_from_text(),
+            "resume_score": self.score_content_completeness(),
         }
+
+        # Hitung skor keseluruhan
+        details["overall_score"] = self.calculate_overall_score(details["field_match_percent"])
+        return details
 
     def get_extracted_data(self):
         return self.details
