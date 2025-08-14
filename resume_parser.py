@@ -330,15 +330,15 @@ class ResumeParser:
             "projects": self.extract_projects(),
             "experience_items": self.extract_experience(),
             "total_experience_years": self.get_total_experience_from_text(),
-            "recommended_skills": recommended_skills,
+            "experience_score": self.score_experience(),
+            "resume_score": self.score_content_completeness(),
             "recommended_field": field_info["field"],
             "matched_field_skills": field_info["matched_skills"],
             "field_match_percent": field_info["match_percent"],
+            "recommended_skills": recommended_skills,
             "recommended_courses": recommended_courses,
             "resume_video_url": videos["resume_video_url"],
             "interview_video_url": videos["interview_video_url"],
-            "experience_score": self.score_experience(),
-            "resume_score": self.score_content_completeness(),
         }
 
         # Hitung skor keseluruhan

@@ -5,8 +5,6 @@ pandas
 pdfplumber
 python-dateutil
 spacy
-rapidfuzz
 langdetect
-phonenumbers
 gunicorn
 PyMuPDF

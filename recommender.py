@@ -11,7 +11,7 @@ from courses import (
 from videos import resume_videos, interview_videos
 
 # === FUNGSI ===
-def recommend_field(skills, experiences=None, top_n=3):
+def recommend_field(skills, experiences=None, top_n=5):
     """
     Rekomendasi bidang pekerjaan berdasarkan skill dan pengalaman kandidat.
     skills: list keterampilan kandidat
