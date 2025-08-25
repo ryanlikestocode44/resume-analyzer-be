@@ -155,11 +155,11 @@ class ResumeParser:
 
             # Regex kombinasi ID & EN
             match = re.search(
-                r'(?i)(?:project|proyek|projek)\s*[:\-–]\s*(.+)', clean_line)
+                r'(?i)(?:project|proyek|projek|karya|portofolio|portfolio|projects)\s*[:\-–]\s*(.+)', clean_line)
 
             if match:
                 title = match.group(1).strip()
-            elif re.match(r'(?i)^(membangun|membuat|merancang|mengembangkan|developed|built|created|designed)\b', clean_line):
+            elif re.match(r'(?i)^(create|determine|provide|membangun|membuat|merancang|mengembangkan|developed|built|created|designed)\b', clean_line):
                 title = clean_line
             else:
                 # fallback: jika baris terlihat seperti judul (title case atau pendek)

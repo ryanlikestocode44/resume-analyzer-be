@@ -6,7 +6,7 @@ from skills import (
     cloud_skills, iot_skills, ml_skills, cs_skills
 )
 from courses import (
-    ds_course, web_course, android_course, ios_course, uiux_course,
+    ds_course, web_course, android_course, ios_course, uiux_course, cloud_course, iot_course, ml_course, cs_course
 )
 from videos import resume_videos, interview_videos
 
@@ -39,7 +39,7 @@ def recommend_field(skills, experiences=None, top_n=5):
         "Cloud Computing": cloud_skills,
         "Internet of Things": iot_skills,
         "Machine Learning": ml_skills,
-        "Cyber Security": cs_skills,
+        "Cybersecurity": cs_skills,
     }
 
     scores = {}
@@ -128,7 +128,7 @@ def recommend_skills(detected_skills, top_n=10):
         "Cloud Computing": cloud_skills,
         "Internet of Things": iot_skills,
         "Machine Learning": ml_skills,
-        "Cyber Security": cs_skills,
+        "Cybersecurity": cs_skills,
     }
 
     predefined_skills = set(skill.lower() for skill in field_skills[field_name])
@@ -147,6 +147,10 @@ def recommend_courses(field):
         "Android Development": android_course,
         "iOS Development": ios_course,
         "UI/UX": uiux_course,
+        "Cloud Computing": cloud_course,
+        "Internet of Things": iot_course,
+        "Machine Learning": ml_course,
+        "Cybersecurity": cs_course,
     }.get(field, [])
 
 def recommend_videos():
