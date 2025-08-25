@@ -26,18 +26,23 @@ Program ini merupakan bagian dari **Tugas Akhir/Skripsi** dengan judul:
    ```bash
    cd backend
 2. **Buat Virtual Environment**
-  python -m venv venv
-  source venv/bin/activate   # Linux/Mac
-  venv\Scripts\activate      # Windows
+   ```bash
+   python -m venv venv
+   source venv/bin/activate   # Linux/Mac
+   venv\Scripts\activate      # Windows
 3. **Install Dependencies**
-  pip install -r requirements.txt
+   ```bash
+   pip install -r requirements.txt
 4. **Unduh Model spaCy dan Resource NLTK**
-  python -m spacy download en_core_web_sm
-  python -m nltk.downloader punkt stopwords averaged_perceptron_tagger
+   ```bash
+   python -m spacy download en_core_web_sm
+   python -m nltk.downloader punkt stopwords averaged_perceptron_tagger
 5. **Jalankan Server**
-  python app.py
+   ```bash
+   python app.py
   atau
-  flask run
+   ```bash
+   flask run
 
 👨‍🎓 **Catatan**
 Backend ini dibuat sebagai bagian dari penyusunan Tugas Akhir/Skripsi dan dirancang untuk mendukung program Resume Analyzer berbasis web.
