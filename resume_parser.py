@@ -132,11 +132,14 @@ class ResumeParser:
             results.extend(matches)
 
         # Ambil kalimat mengandung kata kunci pendidikan (backup heuristic)
-        sentences = self.nlp_en(edu_text)
-        keywords = ['universitas', 'institute', 'college', 'school', 'academy', 'bachelor', 'master', 'phd', 's1', 's2', 's3', 'diploma']
-        for sent in sentences:
-            if any(kw in sent.lower() for kw in keywords):
-                results.append(sent.strip())
+        doc = nlp_en(edu_text)
+        keywords = [
+            'universitas', 'institute', 'college', 'school', 'academy',
+            'bachelor', 'master', 'phd', 's1', 's2', 's3', 'diploma'
+        ]
+        for sent in doc.sents:  # <== pakai sents biar per kalimat
+            if any(kw in sent.text.lower() for kw in keywords):
+                results.append(sent.text.strip())
 
         # Bersihkan dan unik
         cleaned = list(set(r.strip() for r in results if len(r.strip()) >= 5))
