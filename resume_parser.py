@@ -6,6 +6,7 @@ from dateutil import parser as date_parser
 from datetime import datetime
 from nltk import sent_tokenize
 import spacy
+import nltk
 from spacy.cli import download
 from recommender import recommend_courses, recommend_field, recommend_videos, recommend_skills
 
@@ -17,6 +18,11 @@ except OSError:
     print("❌ English model not found. Downloading...")
     download("en_core_web_sm")
     nlp_en = spacy.load("en_core_web_sm")
+
+# Load NLTK punkt tokenizer
+# Pastikan punkt + punkt_tab terdownload
+nltk.download("punkt")
+nltk.download("punkt_tab")
 
 SECTION_KEYWORDS = [
     "skills", "keterampilan", "kemampuan", "proficiencies", "keahlian", "kompetensi",
@@ -132,14 +138,11 @@ class ResumeParser:
             results.extend(matches)
 
         # Ambil kalimat mengandung kata kunci pendidikan (backup heuristic)
-        doc = nlp_en(edu_text)
-        keywords = [
-            'universitas', 'institute', 'college', 'school', 'academy',
-            'bachelor', 'master', 'phd', 's1', 's2', 's3', 'diploma'
-        ]
-        for sent in doc.sents:  # <== pakai sents biar per kalimat
-            if any(kw in sent.text.lower() for kw in keywords):
-                results.append(sent.text.strip())
+        sentences = sent_tokenize(edu_text)
+        keywords = ['universitas', 'institute', 'college', 'school', 'academy', 'bachelor', 'master', 'phd', 's1', 's2', 's3', 'diploma']
+        for sent in sentences:
+            if any(kw in sent.lower() for kw in keywords):
+                results.append(sent.strip())
 
         # Bersihkan dan unik
         cleaned = list(set(r.strip() for r in results if len(r.strip()) >= 5))
