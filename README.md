@@ -40,9 +40,8 @@ Program ini merupakan bagian dari **Tugas Akhir/Skripsi** dengan judul:
 5. **Jalankan Server**
    ```bash
    python app.py
-  atau
-   ```bash
+   atau
    flask run
 
-👨‍🎓 **Catatan**
+## 👨‍🎓 Catatan
 Backend ini dibuat sebagai bagian dari penyusunan Tugas Akhir/Skripsi dan dirancang untuk mendukung program Resume Analyzer berbasis web.
